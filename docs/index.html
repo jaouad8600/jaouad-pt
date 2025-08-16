@@ -1,90 +1,100 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="nl" data-theme="auto">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rapportages — Jaouad PT</title>
+  <meta name="description" content="Dagelijkse rapportages van sessies en bijzonderheden." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <style>
-    :root{ --bg:#0b1220; --card:#111827; --muted:#9aa4b2; --text:#e5e7eb; --ok:#22c55e; --warn:#f59e0b; }
-    *{ box-sizing:border-box }
-    body{ margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji"; background:var(--bg); color:var(--text) }
-    header{ padding:32px 20px; max-width:980px; margin:0 auto }
-    h1{ margin:0 0 6px; font-size:28px }
-    .muted{ color:var(--muted); font-size:14px }
-    main{ max-width:980px; margin:0 auto; padding:0 20px 40px }
-    .status{ padding:12px 14px; border:1px solid #223047; border-radius:12px; background:#0f1a2d; margin:6px 0 18px; font-size:14px }
-    .ok{ color:var(--ok) } .warn{ color:var(--warn) }
-    .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px }
-    .card{ background:var(--card); border:1px solid #1f2937; border-radius:14px; padding:14px }
-    .card h3{ margin:0 0 8px; font-size:16px }
-    .kv{ margin:6px 0; font-size:14px }
-    .kv b{ color:#cbd5e1 }
-    a{ color:#93c5fd; text-decoration:none } a:hover{ text-decoration:underline }
-    footer{ border-top:1px solid #1f2937; margin-top:24px; padding:16px 0; color:var(--muted); font-size:13px }
-    code{ background:#0f1a2d; border:1px solid #223047; padding:1px 6px; border-radius:8px }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/styles.css?v=1" />
 </head>
 <body>
-  <header>
-    <h1>Rapportages</h1>
-    <div class="muted">Live vanaf <code>docs/data/latest.json</code></div>
+  <header class="appbar">
+    <div class="container row between center">
+      <div class="brand row center gap-8">
+        <span class="logo">🏋️</span>
+        <div>
+          <div class="title">Rapportages</div>
+          <div class="subtitle">Live vanuit <code>docs/data/latest.json</code></div>
+        </div>
+      </div>
+      <nav class="row center gap-8">
+        <button id="btn-refresh" class="btn ghost" title="Verversen">↻ Verversen</button>
+        <button id="btn-print" class="btn ghost" title="Print dagrapport">🖨 Print</button>
+        <button id="btn-theme" class="btn" title="Thema wisselen">🌙/☀️</button>
+      </nav>
+    </div>
   </header>
 
-  <main>
-    <div id="status" class="status">Bezig met laden…</div>
-    <section id="list" class="grid" aria-live="polite"></section>
-    <footer><span class="muted">Laatste update: <span id="stamp">—</span></span></footer>
+  <main class="container space-16">
+    <section class="controls card">
+      <div class="row wrap gap-12">
+        <div class="control">
+          <label for="date">Datum</label>
+          <input id="date" type="date" />
+        </div>
+        <div class="control flex-1">
+          <label for="search">Zoeken (groep, begeleider, activiteit, tekst)</label>
+          <input id="search" type="search" placeholder="Typ om te filteren…" />
+        </div>
+        <div class="control">
+          <label for="group">Filter groep</label>
+          <select id="group">
+            <option value="">Alle groepen</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="hasIncident">Bijzonderheden</label>
+          <select id="hasIncident">
+            <option value="">Alles</option>
+            <option value="ja">Alleen met bijzonderheden</option>
+            <option value="nee">Zonder bijzonderheden</option>
+          </select>
+        </div>
+        <div class="ml-auto row gap-8">
+          <a class="btn primary" id="btn-new" target="_blank" rel="noopener">+ Nieuw rapport (GitHub)</a>
+          <a class="btn" id="btn-json" target="_blank" rel="noopener">Open JSON</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="kpis" class="grid kpis">
+      <!-- KPI cards worden via JS gevuld -->
+      <div class="card skeleton"></div>
+      <div class="card skeleton"></div>
+      <div class="card skeleton"></div>
+    </section>
+
+    <section class="card">
+      <div class="row between center">
+        <h2 class="h2" id="heading">Dagoverzicht</h2>
+        <div class="muted" id="meta">—</div>
+      </div>
+      <div id="list" class="list"></div>
+      <div id="empty" class="empty hidden">Geen items voor deze dag.</div>
+      <div id="error" class="error hidden"></div>
+    </section>
   </main>
 
-  <script>
-  (async function(){
-    const status = document.getElementById('status');
-    const list   = document.getElementById('list');
-    const stamp  = document.getElementById('stamp');
+  <footer class="container footer">
+    <div>© <span id="year"></span> Jaouad PT</div>
+    <div class="muted">Thema-toggle onthoudt je keuze. Printvriendelijk dagoverzicht.</div>
+  </footer>
 
-    function show(msg, cls=""){ status.textContent = msg; status.className = "status " + cls; }
+  <!-- Modal -->
+  <dialog id="modal" class="modal">
+    <form method="dialog" class="modal-box">
+      <button class="modal-close" aria-label="Sluiten">✕</button>
+      <div id="modal-body"></div>
+      <div class="row end mt-16">
+        <button class="btn" value="cancel">Sluiten</button>
+      </div>
+    </form>
+    <div class="modal-backdrop"></div>
+  </dialog>
 
-    try {
-      const url = './data/latest.json?v=' + Math.floor(Date.now()/1000);
-      const res = await fetch(url, { cache:'no-store' });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-
-      if (!data || !Array.isArray(data.items) || data.items.length === 0) {
-        show('Geen rapportages gevonden (nog).', 'warn');
-        return;
-      }
-
-      show(`Datum: ${data.date} — ${data.items.length} item(s)`, 'ok');
-      stamp.textContent = new Date().toLocaleString('nl-NL');
-
-      // Render kaarten
-      list.innerHTML = '';
-      for (const it of data.items) {
-        const el = document.createElement('article');
-        el.className = 'card';
-        const safe = (x)=> (x ?? '').toString().replace(/[<>&]/g, s => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[s]));
-        el.innerHTML = `
-          <h3>${safe(it.groep || '—')} — ${safe(it.datum || '—')}</h3>
-          <div class="kv"><b>Begeleider:</b> ${safe(it.begeleider || '—')}</div>
-          <div class="kv"><b>Tijd:</b> ${safe(it.tijdvak || '—')}</div>
-          <div class="kv"><b>Activiteit:</b> ${safe(it.activiteit || '—')}</div>
-          <div class="kv"><b>Opkomst:</b> ${safe(it.opkomst || '—')}</div>
-          <div class="kv"><b>Inhoud:</b> ${safe(it.inhoud || '—')}</div>
-          <div class="kv"><b>Bijzonderheden:</b> ${safe(it.bijzonderheden || '—')}</div>
-          <div class="kv"><b>Vervolg:</b> ${safe(it.vervolg || '—')}</div>
-          <div class="kv"><a href="${safe(it.url)}" target="_blank" rel="noopener">Naar issue #${safe(it.id)}</a></div>
-        `;
-        list.appendChild(el);
-      }
-    } catch (err) {
-      console.error(err);
-      show('Kon data niet laden. Klopt het pad <code>docs/data/latest.json</code>?', 'warn');
-    }
-  })();
-  </script>
+  <script src="./assets/app.js?v=1" defer></script>
 </body>
 </html>
