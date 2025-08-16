@@ -21,9 +21,7 @@ body:
     validations: { required: true }
   - type: dropdown
     id: activiteit
-    attributes:
-      label: Activiteit
-      options: [Voetbal, Fitness, Basketbal, Boksen, Hardlopen, Anders]
+    attributes: { label: Activiteit, options: [Voetbal, Fitness, Basketbal, Boksen, Hardlopen, Anders] }
     validations: { required: true }
   - type: textarea
     id: opkomst
