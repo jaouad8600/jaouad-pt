@@ -1,82 +1,258 @@
 <!DOCTYPE html>
-<html lang="nl" data-theme="auto">
+<html lang="nl" class="">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rapportages — Jaouad PT</title>
-  <meta name="description" content="Dagelijkse rapportages van sport- en groepsmomenten." />
+
+  <!-- Inter font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link href="./assets/styles.css?v=4" rel="stylesheet" />
+
+  <!-- Tailwind via CDN + config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+          colors: {
+            base: {
+              bg: '#0b1220',
+              card: '#0f172a',
+              soft: '#111827',
+              ring: '#1f2937',
+              text: '#e5e7eb',
+              muted: '#9aa4b2'
+            },
+            brand: {
+              50:'#e8fff4',100:'#c6fee4',200:'#92fdd1',300:'#5ff9bf',400:'#2ef2ab',
+              500:'#16d67f',600:'#10b66a',700:'#0d9357',800:'#0b7346',900:'#064b2f'
+            }
+          },
+          boxShadow: {
+            'soft': '0 10px 30px -10px rgb(0 0 0 / 0.25)',
+            'elev': '0 20px 50px -20px rgb(0 0 0 / 0.35)'
+          },
+          borderRadius: { '2xl':'1rem', '3xl':'1.5rem' },
+          transitionTimingFunction: { 'snappy':'cubic-bezier(.2,.8,.2,1)' }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* utility helpers (zonder @apply, werkt met CDN) */
+    .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1rem;border-radius:9999px;font-weight:600;transition:transform .15s var(--tw-ease, ease), box-shadow .2s var(--tw-ease, ease);box-shadow:0 1px 2px rgb(0 0 0 / .05)}
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{color:white;background-image:linear-gradient(135deg,#16d67f 0%,#2ef2ab 100%);box-shadow:0 10px 20px -8px #16d67f80}
+    .btn-primary:hover{box-shadow:0 18px 30px -12px #16d67fb3}
+    .btn-outline{border:1px solid rgb(148 163 184 / .25);background:transparent;color:inherit}
+    .btn-outline:hover{border-color:rgb(148 163 184 / .45);background:rgb(148 163 184 / .06)}
+    .btn-ghost{background:transparent;color:inherit}
+    .chip{display:inline-flex;align-items:center;gap:.35rem;border-radius:9999px;padding:.25rem .6rem;font-size:.75rem;font-weight:600;border:1px solid rgb(148 163 184 / .25)}
+    .card{border-radius:1rem;background:rgba(255,255,255,.06);backdrop-filter:blur(8px);border:1px solid rgb(148 163 184 / .1)}
+    .fade-in{animation:fade-in .35s ease both}@keyframes fade-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+  </style>
 </head>
-<body>
-  <div id="app">
-    <header class="appbar">
-      <div class="brand">
-        <span class="logo">🏋️</span>
-        <span class="title">Rapportages</span>
-        <span class="badge live">Live</span>
+
+<body class="bg-white text-slate-800 dark:bg-base-bg dark:text-base-text min-h-dvh selection:bg-emerald-200/60 dark:selection:bg-emerald-400/20">
+  <!-- Prefer the user’s saved theme -->
+  <script>
+    (function(){
+      const saved = localStorage.theme;
+      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+
+  <!-- Page shell -->
+  <div class="mx-auto max-w-6xl px-4 py-6">
+    <!-- Header -->
+    <header class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="h-9 w-9 rounded-xl bg-emerald-500/15 ring-1 ring-emerald-500/30 grid place-content-center text-emerald-600 dark:text-emerald-400">
+          <!-- logo dot -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
+        </div>
+        <div>
+          <h1 class="text-xl font-extrabold tracking-tight">Rapportages</h1>
+          <p class="text-sm text-slate-500 dark:text-base-muted">Live vanaf <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-base-soft/40">docs/data/latest.json</code></p>
+        </div>
       </div>
-      <div class="actions">
-        <a class="btn btn-ghost" href="https://github.com/jaouad8600/jaouad-pt/issues/new/choose" target="_blank" rel="noopener">
-          + Nieuwe rapportage
-        </a>
-        <button id="refreshBtn" class="btn btn-outline" aria-label="Vernieuwen">↻ Vernieuw</button>
-        <button id="themeBtn" class="btn btn-ghost" aria-label="Schakel thema">
-          <span class="icon sun" aria-hidden="true">☀️</span>
-          <span class="icon moon" aria-hidden="true">🌙</span>
-        </button>
+
+      <div class="flex items-center gap-2">
+        <button id="refreshBtn" class="btn btn-outline"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg>Vernieuw</button>
+        <button id="newIssueBtn" class="btn btn-ghost"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" d="M12 5v14M5 12h14"/></svg>Nieuwe rapportage</button>
+        <button id="themeBtn" class="btn btn-primary" title="Schakel thema"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg><span class="hidden sm:inline">Thema</span></button>
       </div>
     </header>
 
-    <section class="toolbar">
-      <div class="meta">
-        <div class="pill">Bron: <code>docs/data/latest.json</code></div>
-        <div class="pill" id="datePill">Datum: —</div>
-        <div class="pill" id="countPill">0 item(s)</div>
+    <!-- Summary strip -->
+    <section id="summary" class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 fade-in">
+      <div class="card p-5 shadow-soft dark:shadow-elev">
+        <p class="text-xs uppercase tracking-wide text-slate-500 dark:text-base-muted">Datum</p>
+        <p id="dateLabel" class="mt-1 text-lg font-semibold">—</p>
       </div>
-      <div class="filters">
-        <input id="searchInput" class="input" type="search" placeholder="Zoek op groep / begeleider / activiteit..." />
-        <select id="groupSelect" class="select">
-          <option value="">Alle groepen</option>
-        </select>
-        <button id="clearFilters" class="btn btn-ghost">Wissen</button>
+      <div class="card p-5 shadow-soft dark:shadow-elev">
+        <p class="text-xs uppercase tracking-wide text-slate-500 dark:text-base-muted">Aantal items</p>
+        <p id="countLabel" class="mt-1 text-lg font-semibold">—</p>
+      </div>
+      <div class="card p-5 shadow-soft dark:shadow-elev">
+        <p class="text-xs uppercase tracking-wide text-slate-500 dark:text-base-muted">Laatst geüpdatet</p>
+        <p id="updatedLabel" class="mt-1 text-lg font-semibold">—</p>
       </div>
     </section>
 
-    <main>
-      <div id="grid" class="grid">
-        <!-- Skeleton cards -->
-        <div class="card skeleton"></div>
-        <div class="card skeleton"></div>
-        <div class="card skeleton"></div>
-      </div>
+    <!-- Filters -->
+    <section class="mt-6 flex flex-wrap items-center gap-2">
+      <button data-filter="all" class="chip">Alles</button>
+      <button data-filter="fitness" class="chip">Fitness</button>
+      <button data-filter="basketbal" class="chip">Basketbal</button>
+      <button data-filter="boksen" class="chip">Boksen</button>
+      <button data-filter="hardlopen" class="chip">Hardlopen</button>
+    </section>
 
-      <div id="emptyState" class="empty hidden">
-        <div class="empty-card">
-          <h3>Geen resultaten</h3>
-          <p>Er zijn (nog) geen rapportages voor deze dag of ze passen niet in je filter.</p>
-          <div class="empty-actions">
-            <a class="btn btn-primary" href="https://github.com/jaouad8600/jaouad-pt/issues/new/choose" target="_blank" rel="noopener">+ Nieuwe rapportage</a>
-            <button id="clearNow" class="btn btn-outline">Filters wissen</button>
-          </div>
+    <!-- List -->
+    <main id="list" class="mt-6 grid grid-cols-1 gap-4">
+      <!-- items injected here -->
+      <div id="loading" class="card p-8 grid place-content-center text-slate-500 dark:text-base-muted">
+        <div class="flex items-center gap-3">
+          <svg class="h-5 w-5 spin" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9" stroke-width="2" opacity=".25"/><path d="M21 12a9 9 0 0 1-9 9" stroke-width="2"/></svg>
+          <span>Bezig met laden…</span>
         </div>
       </div>
     </main>
 
-    <footer class="footer">
-      <div>Laatste update: <span id="updatedAt">—</span></div>
-      <div class="footer-links">
-        <a href="https://github.com/jaouad8600/jaouad-pt" target="_blank" rel="noopener">Repository</a>
-        <span>·</span>
-        <a href="https://github.com/jaouad8600/jaouad-pt/actions" target="_blank" rel="noopener">Actions</a>
-      </div>
+    <!-- Footer -->
+    <footer class="mt-10 py-8 text-center text-xs text-slate-500 dark:text-base-muted">
+      <p>&copy; <span id="year"></span> — Jaouad PT</p>
     </footer>
   </div>
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script>
+    // ---------- helpers ----------
+    const $ = (s, r=document) => r.querySelector(s);
+    const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+    const fmtTime = (d) => new Intl.DateTimeFormat('nl-NL',{ dateStyle:'short', timeStyle:'medium'}).format(d);
+    const esc = (s='') => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    const by = (k) => (a,b)=>String(a[k]||'').localeCompare(String(b[k]||''));
+    const ico = (name) => {
+      if(name==='clock') return '<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9" stroke-width="2"/><path d="M12 7v5l3 3" stroke-width="2"/></svg>';
+      if(name==='user')  return '<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4" stroke-width="2"/><path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke-width="2"/></svg>';
+      if(name==='tag')   return '<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 10l-8-8H4v8l8 8 8-8z" stroke-width="2"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/></svg>';
+      return '';
+    };
 
-  <script src="./assets/app.js?v=4" defer></script>
+    // ---------- theme toggle ----------
+    $('#themeBtn').addEventListener('click', () => {
+      const root = document.documentElement;
+      const isDark = root.classList.toggle('dark');
+      localStorage.theme = isDark ? 'dark' : 'light';
+    });
+
+    // ---------- data load ----------
+    const SRC = './data/latest.json'; // werkt op GitHub Pages
+    let RAW = null, FILTER = 'all';
+
+    async function load() {
+      $('#loading')?.classList.remove('hidden');
+      const res = await fetch(SRC, { cache:'no-store' });
+      const json = await res.json();
+      RAW = json;
+      renderSummary(json);
+      renderList(json.items || []);
+      $('#loading')?.classList.add('hidden');
+    }
+
+    function renderSummary(data){
+      $('#dateLabel').textContent = data?.date || '—';
+      $('#countLabel').textContent = (data?.items||[]).length;
+      const updated = (data?.items||[])[0]?.updated_at ? new Date((data.items)[0].updated_at) : new Date();
+      $('#updatedLabel').textContent = fmtTime(updated);
+    }
+
+    function badge(text, tone='neutral'){
+      const map = {
+        success: 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400',
+        warn:    'border-amber-500/30 text-amber-600 dark:text-amber-400',
+        info:    'border-sky-500/30 text-sky-600 dark:text-sky-400',
+        neutral: 'border-slate-300/40 text-slate-600 dark:text-slate-300'
+      };
+      return `<span class="chip ${map[tone]||map.neutral}">${esc(text)}</span>`;
+    }
+
+    function card(it){
+      const url = it.url || '#';
+      const activiteit = String(it.activiteit||'').toLowerCase();
+      const tone = activiteit.includes('fit') ? 'success'
+                : activiteit.includes('bok') ? 'info'
+                : activiteit.includes('basket') ? 'warn' : 'neutral';
+
+      return `
+      <article class="card shadow-soft dark:shadow-elev p-5 fade-in">
+        <header class="flex flex-wrap items-start justify-between gap-3">
+          <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-base-muted">
+            ${ico('tag')} ${badge(it.activiteit||'Onbekend', tone)}
+          </div>
+          <a class="btn btn-outline" href="${esc(url)}" target="_blank" rel="noopener">Naar issue #${esc(it.id)}</a>
+        </header>
+
+        <div class="mt-4 grid gap-3 sm:grid-cols-2">
+          <p class="text-sm"><span class="text-slate-500 dark:text-base-muted">Groep:</span> <strong>${esc(it.groep||'—')}</strong></p>
+          <p class="text-sm"><span class="text-slate-500 dark:text-base-muted">Begeleider:</span> <strong>${esc(it.begeleider||'—')}</strong></p>
+          <p class="text-sm"><span class="text-slate-500 dark:text-base-muted">Datum:</span> <strong>${esc(it.datum||'—')}</strong></p>
+          <p class="text-sm"><span class="text-slate-500 dark:text-base-muted">Tijd:</span> <strong>${esc(it.tijdvak||'—')}</strong></p>
+        </div>
+
+        <div class="mt-4 grid gap-4">
+          ${it.opkomst ? `<div><p class="text-xs uppercase tracking-wide text-slate-500 dark:text-base-muted mb-1">Opkomst</p><p class="text-sm leading-relaxed">${esc(it.opkomst)}</p></div>`:''}
+          ${it.inhoud ? `<div><p class="text-xs uppercase tracking-wide text-slate-500 dark:text-base-muted mb-1">Inhoud & verloop</p><p class="text-sm leading-relaxed">${esc(it.inhoud)}</p></div>`:''}
+          ${it.bijzonderheden ? `<div><p class="text-xs uppercase tracking-wide text-slate-500 dark:text-base-muted mb-1">Bijzonderheden</p><p class="text-sm leading-relaxed">${esc(it.bijzonderheden)}</p></div>`:''}
+          ${it.vervolg ? `<div><p class="text-xs uppercase tracking-wide text-slate-500 dark:text-base-muted mb-1">Vervolgacties</p><p class="text-sm leading-relaxed">${esc(it.vervolg)}</p></div>`:''}
+        </div>
+      </article>`;
+    }
+
+    function renderList(items){
+      const root = $('#list');
+      root.innerHTML = '';
+      let rows = items.slice().sort(by('groep'));
+      if (FILTER !== 'all') {
+        rows = rows.filter(x => String(x.activiteit||'').toLowerCase().includes(FILTER));
+      }
+      if (!rows.length) {
+        root.innerHTML = '<div class="card p-8 text-center text-slate-500 dark:text-base-muted">Geen items gevonden voor deze filters.</div>';
+        return;
+      }
+      root.innerHTML = rows.map(card).join('');
+    }
+
+    // filters
+    $$('.chip[data-filter]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        FILTER = btn.getAttribute('data-filter');
+        $$('.chip[data-filter]').forEach(b => b.classList.remove('ring','ring-emerald-400/40'));
+        btn.classList.add('ring','ring-emerald-400/40');
+        renderList(RAW?.items||[]);
+      });
+    });
+
+    // refresh
+    $('#refreshBtn').addEventListener('click', load);
+
+    // CTA naar issue form (open issues/new met template als je wilt)
+    $('#newIssueBtn').addEventListener('click', ()=>{
+      window.open('https://github.com/jaouad8600/jaouad-pt/issues/new?labels=rapportage&title=%5BRapportage%5D%20&body=**Datum**%0A%0A%0A**Tijd**%0A%0A%0A**Groep**%0A%0A%0A**Begeleider**%0A%0A%0A**Activiteit**%0A%0A%0A**Opkomst**%0A%0A%0A**Inhoud%20%26%20verloop**%0A%0A%0A**Bijzonderheden%20%2F%20incidenten**%0A%0A%0A**Vervolgacties**%0A%0A', '_blank');
+    });
+
+    // init
+    $('#year').textContent = new Date().getFullYear();
+    load();
+  </script>
 </body>
 </html>
