@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: write
-  issues: read
+  issues: write
 
 jobs:
   build:
@@ -23,17 +23,13 @@ jobs:
           script: |
             try {
               await github.rest.issues.getLabel({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                name: "rapportage"
+                owner: context.repo.owner, repo: context.repo.repo, name: "rapportage"
               });
               core.info("Label 'rapportage' bestaat.");
             } catch {
               await github.rest.issues.createLabel({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                name: "rapportage",
-                color: "FF7A00",
+                owner: context.repo.owner, repo: context.repo.repo,
+                name: "rapportage", color: "FF7A00",
                 description: "Ingevulde sport-rapportage"
               });
               core.info("Label 'rapportage' aangemaakt.");
@@ -46,16 +42,12 @@ jobs:
           script: |
             const n = context.payload.issue.number;
             const { data: labels } = await github.rest.issues.listLabelsOnIssue({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: n
+              owner: context.repo.owner, repo: context.repo.repo, issue_number: n
             });
             const has = labels.some(l => (l.name || "").toLowerCase() === "rapportage");
             if (!has) {
               await github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: n,
+                owner: context.repo.owner, repo: context.repo.repo, issue_number: n,
                 labels: ["rapportage"]
               });
               core.info("Label toegevoegd.");
@@ -70,9 +62,14 @@ jobs:
           script: |
             const body = context.payload.issue?.body || "";
             function pick(label) {
-              const re = new RegExp(String.raw`\\*\\*${label}\\*\\*[\\r\\n]+([\\s\\S]*?)(?=(\\*\\*.+?\\*\\*)|$)`);
-              const m = re.exec(body);
-              return m ? m[1].trim() : "";
+              const patterns = [
+                new RegExp(String.raw`(?:\\*\\*\\s*${label}\\s*\\*\\*|^###\\s*${label})\\s*[\\r\\n]+([\\s\\S]*?)(?=(?:\\*\\*.+?\\*\\*|^###\\s*.+|$))`, "im"),
+              ];
+              for (const re of patterns) {
+                const m = re.exec(body);
+                if (m) return (m[1] || "").trim();
+              }
+              return "";
             }
             const groep = pick("Groep") || "—";
             const datum = pick("Datum") || "—";
@@ -80,8 +77,7 @@ jobs:
             const desired = `[Rapportage] ${groep} — ${datum} — ${begeleider}`;
             if ((context.payload.issue.title || "") !== desired) {
               await github.rest.issues.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+                owner: context.repo.owner, repo: context.repo.repo,
                 issue_number: context.payload.issue.number,
                 title: desired
               });

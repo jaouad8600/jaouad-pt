@@ -32,11 +32,16 @@ function parseIssueBody(body = "") {
     "Bijzonderheden / incidenten": "bijzonderheden",
     "Vervolgacties": "vervolg"
   };
-  const re = /\*\*(.+?)\*\*[\r\n]+([\s\S]*?)(?=(\*\*.+?\*\*)|$)/g;
-  let m;
-  while ((m = re.exec(body))) {
-    const key = map[(m[1] || "").trim()];
-    if (key) out[key] = (m[2] || "").trim();
+  const patterns = [
+    /\*\*\s*(.+?)\s*\*\*[\r\n]+([\s\S]*?)(?=(\*\*.+?\*\*)|$)/g,                      // **Label**
+    /^###\s*(.+?)\s*[\r\n]+([\s\S]*?)(?=^###\s*.+?$|^\*\*.+?\*\*|$)/gmi              // ### Label
+  ];
+  for (const re of patterns) {
+    let m;
+    while ((m = re.exec(body))) {
+      const key = map[(m[1] || "").trim()];
+      if (key && !out[key]) out[key] = (m[2] || "").trim();
+    }
   }
   return out;
 }
