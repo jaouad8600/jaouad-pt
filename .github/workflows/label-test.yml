@@ -12,9 +12,20 @@ jobs:
         with:
           script: |
             const name = "rapportage";
-            try { await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name }); }
-            catch (_) { await github.rest.issues.createLabel({ owner: context.repo.owner, repo: context.repo.repo, name, color: "FF7A00" }); }
+            // 1) Zorg dat het label bestaat
+            try {
+              await github.rest.issues.getLabel({
+                owner: context.repo.owner, repo: context.repo.repo, name
+              });
+            } catch {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner, repo: context.repo.repo,
+                name, color: "FF7A00", description: "Ingevulde sport-rapportage"
+              });
+            }
+            // 2) Zet het label op het huidige issue
             await github.rest.issues.addLabels({
               owner: context.repo.owner, repo: context.repo.repo,
-              issue_number: context.payload.issue.number, labels: [name]
+              issue_number: context.payload.issue.number,
+              labels: [name]
             });
