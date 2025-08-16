@@ -1,4 +1,19 @@
 {
-  "date": null,
-  "items": []
+  "date": "2025-08-16",
+  "items": [
+    {
+      "id": 8,
+      "url": "https://github.com/jaouad8600/jaouad-pt/issues/8",
+      "updated_at": "2025-08-16T21:59:09Z",
+      "datum": "2025-08-16",
+      "tijdvak": "14:00",
+      "groep": "groep a",
+      "begeleider": "jaouad",
+      "activiteit": "Fitness",
+      "opkomst": "dit is een test",
+      "inhoud": "ewfewew",
+      "bijzonderheden": "Eef",
+      "vervolg": "ewfwef"
+    }
+  ]
 }
