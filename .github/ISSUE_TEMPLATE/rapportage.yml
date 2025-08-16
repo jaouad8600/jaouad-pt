@@ -5,28 +5,19 @@ labels: [rapportage]
 body:
   - type: input
     id: datum
-    attributes:
-      label: Datum
-      description: "JJJJ-MM-DD"
-      placeholder: "2025-08-16"
+    attributes: { label: Datum, description: "JJJJ-MM-DD", placeholder: "2025-08-16" }
     validations: { required: true }
   - type: input
     id: tijdvak
-    attributes:
-      label: Tijd
-      placeholder: "14:00–15:00"
+    attributes: { label: Tijd, placeholder: "14:00–15:00" }
     validations: { required: true }
   - type: input
     id: groep
-    attributes:
-      label: Groep
-      placeholder: "Bijv. Groep A / Unit 3"
+    attributes: { label: Groep, placeholder: "Bijv. Groep A / Unit 3" }
     validations: { required: true }
   - type: input
     id: begeleider
-    attributes:
-      label: Begeleider
-      placeholder: "Voor- en achternaam"
+    attributes: { label: Begeleider, placeholder: "Voor- en achternaam" }
     validations: { required: true }
   - type: dropdown
     id: activiteit
@@ -36,18 +27,13 @@ body:
     validations: { required: true }
   - type: textarea
     id: opkomst
-    attributes:
-      label: Opkomst
-      description: "Aanwezig/afwezig + aantallen"
+    attributes: { label: Opkomst }
   - type: textarea
     id: inhoud
-    attributes:
-      label: Inhoud & verloop
+    attributes: { label: Inhoud & verloop }
   - type: textarea
     id: bijzonderheden
-    attributes:
-      label: Bijzonderheden / incidenten
+    attributes: { label: Bijzonderheden / incidenten }
   - type: textarea
     id: vervolg
-    attributes:
-      label: Vervolgacties
+    attributes: { label: Vervolgacties }

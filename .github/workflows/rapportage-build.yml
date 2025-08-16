@@ -3,9 +3,11 @@ on:
   issues:
     types: [opened, edited, labeled, unlabeled]
   workflow_dispatch:
+
 permissions:
   contents: write
   issues: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
