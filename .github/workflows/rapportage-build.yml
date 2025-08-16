@@ -3,11 +3,9 @@ on:
   issues:
     types: [opened, edited, labeled, unlabeled]
   workflow_dispatch:
-
 permissions:
   contents: write
   issues: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,17 +20,13 @@ jobs:
         with:
           script: |
             try {
-              await github.rest.issues.getLabel({
-                owner: context.repo.owner, repo: context.repo.repo, name: "rapportage"
-              });
-              core.info("Label 'rapportage' bestaat.");
+              await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name: "rapportage" });
             } catch {
               await github.rest.issues.createLabel({
                 owner: context.repo.owner, repo: context.repo.repo,
                 name: "rapportage", color: "FF7A00",
                 description: "Ingevulde sport-rapportage"
               });
-              core.info("Label 'rapportage' aangemaakt.");
             }
 
       - name: Ensure current issue has 'rapportage' label
@@ -44,15 +38,11 @@ jobs:
             const { data: labels } = await github.rest.issues.listLabelsOnIssue({
               owner: context.repo.owner, repo: context.repo.repo, issue_number: n
             });
-            const has = labels.some(l => (l.name || "").toLowerCase() === "rapportage");
-            if (!has) {
+            if (!labels.some(l => (l.name||"").toLowerCase() === "rapportage")) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner, repo: context.repo.repo, issue_number: n,
                 labels: ["rapportage"]
               });
-              core.info("Label toegevoegd.");
-            } else {
-              core.info("Label was al aanwezig.");
             }
 
       - name: Retitle issue from form fields
@@ -62,14 +52,9 @@ jobs:
           script: |
             const body = context.payload.issue?.body || "";
             function pick(label) {
-              const patterns = [
-                new RegExp(String.raw`(?:\\*\\*\\s*${label}\\s*\\*\\*|^###\\s*${label})\\s*[\\r\\n]+([\\s\\S]*?)(?=(?:\\*\\*.+?\\*\\*|^###\\s*.+|$))`, "im"),
-              ];
-              for (const re of patterns) {
-                const m = re.exec(body);
-                if (m) return (m[1] || "").trim();
-              }
-              return "";
+              const re = new RegExp(String.raw`(?:\\*\\*\\s*${label}\\s*\\*\\*|^###\\s*${label})\\s*[\\r\\n]+([\\s\\S]*?)(?=(?:\\*\\*.+?\\*\\*|^###\\s*.+|$))`, "im");
+              const m = re.exec(body);
+              return m ? (m[1]||"").trim() : "";
             }
             const groep = pick("Groep") || "—";
             const datum = pick("Datum") || "—";
@@ -81,9 +66,6 @@ jobs:
                 issue_number: context.payload.issue.number,
                 title: desired
               });
-              core.info(`Title updated: ${desired}`);
-            } else {
-              core.info("Title al correct.");
             }
 
       - name: Build JSON (no deps)
@@ -92,7 +74,7 @@ jobs:
           REPO: ${{ github.repository }}
         run: node scripts/build.mjs
 
-      - name: Copy JSON to docs
+      - name: Publish JSON to docs/data
         run: |
           mkdir -p docs/data
           cp -f data/*.json docs/data/ || true

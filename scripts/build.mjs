@@ -54,16 +54,16 @@ function toDateNL(s) {
     year: "numeric",
     month: "2-digit",
     day: "2-digit"
-  }).formatToParts(d).reduce((a, p) => (a[p.type] = p.value, a), {});
+  }).formatToParts(d).reduce((a,p)=>(a[p.type]=p.value,a),{});
   return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
-function ensureDir(p) { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); }
+function ensureDir(p){ if(!fs.existsSync(p)) fs.mkdirSync(p,{recursive:true}); }
 
-async function listAllIssues() {
+async function listAllIssues(){
   const out = [];
   let page = 1;
-  while (true) {
+  for(;;){
     const data = await gh(`/repos/${owner}/${repoName}/issues?state=all&per_page=100&page=${page}`);
     const issuesOnly = data.filter(i => !i.pull_request);
     out.push(...issuesOnly);
@@ -73,9 +73,9 @@ async function listAllIssues() {
   return out;
 }
 
-(async function main() {
+(async function main(){
   const all = await listAllIssues();
-  const issues = all.filter(it => (it.labels || []).some(l => (l.name || "").toLowerCase() === "rapportage"));
+  const issues = all.filter(it => (it.labels||[]).some(l => (l.name||"").toLowerCase() === "rapportage"));
 
   const byDate = new Map();
   for (const issue of issues) {
@@ -95,9 +95,8 @@ async function listAllIssues() {
 
   const dates = [...byDate.keys()].sort();
   const latest = dates[dates.length - 1];
-
   for (const d of dates) {
-    const items = (byDate.get(d) || []).sort((a, b) => (a.groep || "").localeCompare(b.groep || ""));
+    const items = (byDate.get(d) || []).sort((a,b)=> (a.groep||'').localeCompare(b.groep||''));
     fs.writeFileSync(`data/${d}.json`, JSON.stringify({ date: d, items }, null, 2));
   }
   fs.writeFileSync("data/latest.json", JSON.stringify({ date: latest, items: byDate.get(latest) }, null, 2));
