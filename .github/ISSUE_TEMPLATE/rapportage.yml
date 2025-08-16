@@ -1,0 +1,11 @@
+name: "Rapportage sportmoment"
+description: "Vul dit formulier in na een sportmoment."
+title: "[Rapportage] {{ groep }} — {{ datum }} — {{ begeleider }}"
+labels: [rapportage]
+body:
+  - type: input
+    id: datum
+    attributes:
+      label: Datum
+      placeholder: "2025-08-16"
+    validations: { required: true }
