@@ -33,8 +33,8 @@ function parseIssueBody(body = "") {
     "Vervolgacties": "vervolg"
   };
   const patterns = [
-    /\*\*\s*(.+?)\s*\*\*[\r\n]+([\s\S]*?)(?=(\*\*.+?\*\*)|$)/g,                      // **Label**
-    /^###\s*(.+?)\s*[\r\n]+([\s\S]*?)(?=^###\s*.+?$|^\*\*.+?\*\*|$)/gmi              // ### Label
+    /\*\*\s*(.+?)\s*\*\*[\r\n]+([\s\S]*?)(?=(\*\*.+?\*\*)|$)/g,             // **Label**
+    /^###\s*(.+?)\s*[\r\n]+([\s\S]*?)(?=^###\s*.+?$|^\*\*.+?\*\*|$)/gmi     // ### Label
   ];
   for (const re of patterns) {
     let m;
