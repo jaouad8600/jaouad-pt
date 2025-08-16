@@ -5,7 +5,35 @@ labels: [rapportage]
 body:
   - type: input
     id: datum
-    attributes:
-      label: Datum
-      placeholder: "2025-08-16"
+    attributes: { label: Datum, placeholder: "2025-08-16" }
     validations: { required: true }
+  - type: input
+    id: tijdvak
+    attributes: { label: Tijd, placeholder: "14:00–15:00" }
+    validations: { required: true }
+  - type: input
+    id: groep
+    attributes: { label: Groep, placeholder: "Groep A" }
+    validations: { required: true }
+  - type: input
+    id: begeleider
+    attributes: { label: Begeleider, placeholder: "Naam" }
+    validations: { required: true }
+  - type: dropdown
+    id: activiteit
+    attributes:
+      label: Activiteit
+      options: [Voetbal, Fitness, Basketbal, Boksen, Hardlopen, Anders]
+    validations: { required: true }
+  - type: textarea
+    id: opkomst
+    attributes: { label: Opkomst }
+  - type: textarea
+    id: inhoud
+    attributes: { label: "Inhoud & verloop" }
+  - type: textarea
+    id: bijzonderheden
+    attributes: { label: "Bijzonderheden / incidenten" }
+  - type: textarea
+    id: vervolg
+    attributes: { label: Vervolgacties }
