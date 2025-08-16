@@ -3,6 +3,7 @@ on:
   issues:
     types: [opened, edited, labeled, unlabeled]
   workflow_dispatch:
+
 permissions:
   contents: write
   issues: read
@@ -16,25 +17,52 @@ jobs:
         with:
           node-version: '20'
 
-      # Zorg dat het label bestaat (case-insensitive), en voeg het toe bij 'opened'
-      - name: Ensure label & auto-apply on opened
+      - name: Ensure 'rapportage' label exists
         uses: actions/github-script@v7
         with:
           script: |
-            const want = "Rapportage";
-            const {owner, repo} = context.repo;
-            const labels = await github.paginate(github.rest.issues.listLabelsForRepo, {owner, repo, per_page: 100});
-            const exists = labels.some(l => l.name.toLowerCase() === want.toLowerCase());
-            if (!exists) {
-              try { await github.rest.issues.createLabel({owner, repo, name: want, color: "FF7A00", description: "Ingevulde sport-rapportage"}); }
-              catch(e){ core.warning(`createLabel failed: ${e.message}`); }
-            }
-            if (context.eventName === "issues" && context.payload.action === "opened") {
-              try { await github.rest.issues.addLabels({owner, repo, issue_number: context.payload.issue.number, labels: [want]}); }
-              catch(e){ core.warning(`addLabels failed: ${e.message}`); }
+            try {
+              await github.rest.issues.getLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: "rapportage"
+              });
+              core.info("Label 'rapportage' bestaat.");
+            } catch {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: "rapportage",
+                color: "FF7A00",
+                description: "Ingevulde sport-rapportage"
+              });
+              core.info("Label 'rapportage' aangemaakt.");
             }
 
-      # Titel netjes maken op basis van form
+      - name: Ensure current issue has 'rapportage' label
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const n = context.payload.issue.number;
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: n
+            });
+            const has = labels.some(l => (l.name || "").toLowerCase() === "rapportage");
+            if (!has) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: n,
+                labels: ["rapportage"]
+              });
+              core.info("Label toegevoegd.");
+            } else {
+              core.info("Label was al aanwezig.");
+            }
+
       - name: Retitle issue from form fields
         if: github.event_name == 'issues'
         uses: actions/github-script@v7
@@ -50,12 +78,19 @@ jobs:
             const datum = pick("Datum") || "—";
             const begeleider = pick("Begeleider") || "—";
             const desired = `[Rapportage] ${groep} — ${datum} — ${begeleider}`;
-            if (context.payload.issue.title !== desired) {
-              await github.rest.issues.update({owner: context.repo.owner, repo: context.repo.repo, issue_number: context.payload.issue.number, title: desired});
+            if ((context.payload.issue.title || "") !== desired) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                title: desired
+              });
               core.info(`Title updated: ${desired}`);
+            } else {
+              core.info("Title al correct.");
             }
 
-      - name: Build JSON (fetch API, geen npm nodig)
+      - name: Build JSON (no deps)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}

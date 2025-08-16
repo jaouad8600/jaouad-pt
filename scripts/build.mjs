@@ -15,11 +15,11 @@ async function gh(path) {
       "User-Agent": "rapportage-builder"
     }
   });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText} for ${path}`);
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}: ${await res.text()}`);
   return res.json();
 }
 
-function parseIssueBody(body) {
+function parseIssueBody(body = "") {
   const out = {};
   const map = {
     "Datum": "datum",
@@ -30,57 +30,47 @@ function parseIssueBody(body) {
     "Opkomst": "opkomst",
     "Inhoud & verloop": "inhoud",
     "Bijzonderheden / incidenten": "bijzonderheden",
-    "Vervolgacties": "vervolg",
+    "Vervolgacties": "vervolg"
   };
-  const regex = /\*\*(.+?)\*\*[\r\n]+([\s\S]*?)(?=(\*\*.+?\*\*)|$)/g;
+  const re = /\*\*(.+?)\*\*[\r\n]+([\s\S]*?)(?=(\*\*.+?\*\*)|$)/g;
   let m;
-  while ((m = regex.exec(body || ""))) {
-    const label = m[1].trim();
-    const val = m[2].trim();
-    const key = map[label];
-    if (key) out[key] = val;
+  while ((m = re.exec(body))) {
+    const key = map[(m[1] || "").trim()];
+    if (key) out[key] = (m[2] || "").trim();
   }
   return out;
 }
 
-function toDateNL(dateStr) {
-  try { if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr; } catch {}
-  const d = new Date(dateStr);
-  const fmt = new Intl.DateTimeFormat("nl-NL", {
-    timeZone: "Europe/Amsterdam",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  });
-  const parts = fmt.formatToParts(d).reduce((a,p)=>((a[p.type]=p.value),a),{});
+function toDateNL(s) {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const d = new Date(s);
+  const parts = new Intl.DateTimeFormat("nl-NL", {
+    timeZone: "Europe/Amsterdam", year: "numeric", month: "2-digit", day: "2-digit"
+  }).formatToParts(d).reduce((a, p) => (a[p.type] = p.value, a), {});
   return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
-function ensureDir(p) { if(!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); }
+function ensureDir(p) { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); }
 
 async function listAllIssues() {
-  const items = [];
+  const out = [];
   let page = 1;
   while (true) {
     const data = await gh(`/repos/${owner}/${repoName}/issues?state=all&per_page=100&page=${page}`);
-    // GitHub API returns PRs here too; filter die er uit
-    const issuesOnly = data.filter(x => !x.pull_request);
-    items.push(...issuesOnly);
+    const issuesOnly = data.filter(i => !i.pull_request);
+    out.push(...issuesOnly);
     if (data.length < 100) break;
     page++;
   }
-  return items;
+  return out;
 }
 
-async function main(){
-  const results = await listAllIssues();
-  // Filter op label 'rapportage' (case-insensitive), zodat 'Rapportage' ook matcht
-  const filtered = results.filter(it =>
-    (it.labels || []).some(l => (l.name || "").toLowerCase() === "rapportage")
-  );
+(async function main() {
+  const all = await listAllIssues();
+  const issues = all.filter(it => (it.labels || []).some(l => (l.name || "").toLowerCase() === "rapportage"));
 
   const byDate = new Map();
-  for (const issue of filtered) {
+  for (const issue of issues) {
     const payload = parseIssueBody(issue.body || "");
     if (!payload.datum) continue;
     const d = toDateNL(payload.datum);
@@ -99,10 +89,8 @@ async function main(){
   const latest = dates[dates.length - 1];
 
   for (const d of dates) {
-    const items = byDate.get(d).sort((a,b)=> (a.groep||'').localeCompare(b.groep||''));
+    const items = (byDate.get(d) || []).sort((a, b) => (a.groep || "").localeCompare(b.groep || ""));
     fs.writeFileSync(`data/${d}.json`, JSON.stringify({ date: d, items }, null, 2));
   }
   fs.writeFileSync("data/latest.json", JSON.stringify({ date: latest, items: byDate.get(latest) }, null, 2));
-}
-
-main().catch(e => { console.error(e); process.exit(1); });
+})().catch(e => { console.error(e); process.exit(1); });
