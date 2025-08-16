@@ -1,1 +1,57 @@
-...hierboven index.html code...
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jaouad PT • Personal Training</title>
+  <meta name="description" content="Personal training, coaching en voedingsadvies van Jaouad PT." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f172a; --card:#1e293b; --muted:#94a3b8; --text:#f1f5f9; --accent:#22c55e;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
+    body{background:var(--bg);color:var(--text);line-height:1.6;}
+    header{padding:4rem 2rem;text-align:center;}
+    header h1{font-size:2.5rem;font-weight:800;}
+    header p{font-size:1.2rem;color:var(--muted);}
+    .section{max-width:800px;margin:2rem auto;padding:2rem;background:var(--card);border-radius:12px;}
+    h2{color:var(--accent);margin-bottom:1rem;}
+    footer{text-align:center;padding:2rem;color:var(--muted);}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Jaouad PT</h1>
+    <p>Personal training die wél werkt</p>
+  </header>
+
+  <section class="section">
+    <h2>Over mij</h2>
+    <p>Ik ben Jaouad, gecertificeerd personal trainer. Mijn doel is om jou sterker, fitter en energieker te maken met op maat gemaakte programma’s.</p>
+  </section>
+
+  <section class="section">
+    <h2>Diensten</h2>
+    <ul>
+      <li>1-op-1 personal training</li>
+      <li>Voedingsbegeleiding</li>
+      <li>Small group trainingen</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>Contact</h2>
+    <p>Mail: <a href="mailto:info@jaouad-pt.nl">info@jaouad-pt.nl</a></p>
+  </section>
+
+  <footer>
+    <p>© <span id="year"></span> Jaouad PT</p>
+  </footer>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
