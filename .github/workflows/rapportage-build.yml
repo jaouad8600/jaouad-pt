@@ -14,11 +14,41 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      # Titel automatisch zetten op basis van body-velden
+      - name: Retitle issue from form fields
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue?.body || "";
+            function pick(label) {
+              const re = new RegExp(String.raw`\\*\\*${label}\\*\\*[\\r\\n]+([\\s\\S]*?)(?=(\\*\\*.+?\\*\\*)|$)`, "g");
+              const m = re.exec(body);
+              return m ? m[1].trim() : "";
+            }
+            const groep = pick("Groep") || "—";
+            const datum = pick("Datum") || "—";
+            const begeleider = pick("Begeleider") || "—";
+            const newTitle = `[Rapportage] ${groep} — ${datum} — ${begeleider}`;
+            if ((context.payload.issue.title || "") !== newTitle) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                title: newTitle
+              });
+              core.info(`Title updated to: ${newTitle}`);
+            } else {
+              core.info("Title already correct, skipping.");
+            }
+
       - name: Build JSON (no deps)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
         run: node scripts/build.mjs
+
       - name: Commit & push
         run: |
           git config user.name "github-actions[bot]"
