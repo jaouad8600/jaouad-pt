@@ -1,3 +1,4 @@
+cat > index.html <<'HTML'
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -7,51 +8,194 @@
   <meta name="description" content="Personal training, coaching en voedingsadvies van Jaouad PT." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#0f172a; --card:#1e293b; --muted:#94a3b8; --text:#f1f5f9; --accent:#22c55e;
-    }
-    *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
-    body{background:var(--bg);color:var(--text);line-height:1.6;}
-    header{padding:4rem 2rem;text-align:center;}
-    header h1{font-size:2.5rem;font-weight:800;}
-    header p{font-size:1.2rem;color:var(--muted);}
-    .section{max-width:800px;margin:2rem auto;padding:2rem;background:var(--card);border-radius:12px;}
-    h2{color:var(--accent);margin-bottom:1rem;}
-    footer{text-align:center;padding:2rem;color:var(--muted);}
+    :root{ --bg:#0f172a; --card:#111827; --muted:#94a3b8; --text:#e5e7eb; --brand:#22c55e; --brand-2:#10b981; --ring:#34d39955; }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+      background:radial-gradient(1200px 800px at 80% -10%, #1f2937 0%, transparent 60%),
+                 radial-gradient(800px 600px at 0% 0%, #0b1221 0%, transparent 60%), var(--bg);
+      color:var(--text);line-height:1.6;}
+    a{color:var(--brand);text-decoration:none} a:hover{color:var(--brand-2)}
+    .container{width:min(1100px,92%);margin:0 auto}
+    .btn{display:inline-block;background:var(--brand);color:#041307;font-weight:700;padding:.9rem 1.2rem;border-radius:14px;transition:.2s;box-shadow:0 10px 25px rgba(16,185,129,.15)}
+    .btn:hover{transform:translateY(-1px);background:var(--brand-2)}
+    .btn.ghost{background:#0b1424;color:var(--text);border:1px solid #1f2937}.btn.ghost:hover{background:#0f1b30}
+    header{position:sticky;top:0;z-index:50;backdrop-filter:saturate(1.2) blur(8px);background:rgba(2,6,23,.55);border-bottom:1px solid rgba(255,255,255,.04)}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0}
+    .brand{display:flex;gap:.7rem;align-items:center;font-weight:800;letter-spacing:.4px}
+    .brand-logo{height:30px;width:30px;border-radius:8px;background:linear-gradient(135deg,var(--brand),#4ade80);display:grid;place-items:center;color:#052e1a;font-weight:900}
+    .nav-links{display:flex;gap:1.2rem}.nav-links a{font-weight:600;color:#cbd5e1}
+    .hero{padding:7rem 0 4rem;text-align:center}
+    .eyebrow{display:inline-block;font-size:.85rem;color:#a7b0c3;background:rgba(148,163,184,.12);padding:.35rem .6rem;border:1px solid rgba(148,163,184,.2);border-radius:999px}
+    h1{font-size:clamp(2rem,3.4vw + 1rem,4rem);line-height:1.1;margin:1rem 0 .8rem}
+    .lead{font-size:1.15rem;color:#cbd5e1;max-width:750px;margin:0 auto 1.6rem}
+    .cta{display:flex;gap:.8rem;margin-top:1.2rem;justify-content:center;flex-wrap:wrap}
+    .grid{display:grid;gap:1.2rem}.features{padding:3rem 0}
+    @media(min-width:900px){.grid.cols-3{grid-template-columns:repeat(3,1fr)}}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:1.3rem}
+    .card h3{margin:.4rem 0 .3rem}.kicker{color:var(--muted);font-size:.95rem}
+    .section{padding:4rem 0}.two-col{display:grid;gap:2rem}
+    @media(min-width:900px){.two-col{grid-template-columns:1.1fr .9fr;align-items:center}}
+    .blob{position:relative;border-radius:24px;overflow:hidden;border:1px solid rgba(255,255,255,.06);background:#0b1424}
+    .blob::before{content:\"\";position:absolute;inset:-30% -30% auto auto;width:70%;height:70%;background:radial-gradient(closest-side,rgba(52,211,153,.15),transparent 70%)}
+    .list{display:grid;gap:.6rem;padding:0;margin:1rem 0;list-style:none}
+    .list li{display:flex;gap:.6rem;align-items:flex-start}
+    .bullet{height:9px;width:9px;border-radius:999px;background:var(--brand);margin-top:.55rem}
+    .pricing{padding:4rem 0}.price-card{padding:2rem;border-radius:22px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(34,197,94,.08),rgba(255,255,255,.02));text-align:center}
+    .price{font-size:2.6rem;font-weight:800}
+    form{display:grid;gap:.8rem}
+    input,textarea{width:100%;padding:.9rem 1rem;border-radius:12px;border:1px solid #1f2937;background:#0b1424;color:var(--text)}
+    input:focus,textarea:focus{outline:none;box-shadow:0 0 0 4px var(--ring)}
+    footer{padding:3rem 0;color:#94a3b8;border-top:1px solid rgba(255,255,255,.06)}
   </style>
 </head>
 <body>
   <header>
-    <h1>Jaouad PT</h1>
-    <p>Personal training die wél werkt</p>
+    <div class="container nav">
+      <div class="brand"><div class="brand-logo">J</div> <span>Jaouad PT</span></div>
+      <nav class="nav-links">
+        <a href="#diensten">Diensten</a>
+        <a href="#over">Over</a>
+        <a href="#prijzen">Prijzen</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
   </header>
 
-  <section class="section">
-    <h2>Over mij</h2>
-    <p>Ik ben Jaouad, gecertificeerd personal trainer. Mijn doel is om jou sterker, fitter en energieker te maken met op maat gemaakte programma’s.</p>
-  </section>
+  <main>
+    <section class="hero container">
+      <span class="eyebrow">Personal Training & Coaching</span>
+      <h1>Bereik je doel met persoonlijke begeleiding</h1>
+      <p class="lead">Met een combinatie van training, voeding en coaching help ik je sterker, fitter en zelfverzekerder te worden. Gericht en praktisch, afgestemd op jouw situatie.</p>
+      <div class="cta">
+        <a class="btn" href="#contact">Plan een gesprek</a>
+        <a class="btn ghost" href="#diensten">Bekijk diensten</a>
+      </div>
+    </section>
 
-  <section class="section">
-    <h2>Diensten</h2>
-    <ul>
-      <li>1-op-1 personal training</li>
-      <li>Voedingsbegeleiding</li>
-      <li>Small group trainingen</li>
-    </ul>
-  </section>
+    <section id="diensten" class="features container">
+      <div class="grid cols-3">
+        <article class="card">
+          <div class="kicker">Dienst 1</div>
+          <h3>Personal Training</h3>
+          <p>1-op-1 training afgestemd op jouw doelen. Kracht, conditie of afvallen: alles is mogelijk.</p>
+        </article>
+        <article class="card">
+          <div class="kicker">Dienst 2</div>
+          <h3>Voeding & Coaching</h3>
+          <p>Persoonlijk voedingsadvies en coaching om je resultaten sneller en blijvend te maken.</p>
+        </article>
+        <article class="card">
+          <div class="kicker">Dienst 3</div>
+          <h3>Small Group Training</h3>
+          <p>Train in kleine groepen (max 6 personen) met persoonlijke aandacht en groepsmotivatie.</p>
+        </article>
+      </div>
+    </section>
 
-  <section class="section">
-    <h2>Contact</h2>
-    <p>Mail: <a href="mailto:info@jaouad-pt.nl">info@jaouad-pt.nl</a></p>
-  </section>
+    <section id="over" class="section">
+      <div class="container two-col">
+        <div>
+          <h2>Over Jaouad PT</h2>
+          <p>Ik help mensen sterker, fitter en zelfverzekerder te worden. Mijn aanpak combineert ervaring, bewezen methodes en persoonlijke aandacht.</p>
+          <ul class="list">
+            <li><span class="bullet"></span> Ervaring met jeugd, volwassenen en topsporters</li>
+            <li><span class="bullet"></span> Praktische, resultaatgerichte aanpak</li>
+            <li><span class="bullet"></span> Locatie: [stad/regio] • Online mogelijk</li>
+          </ul>
+          <a class="btn" href="#contact">Vrijblijvend kennismaken</a>
+        </div>
+        <div class="blob" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=1400&auto=format&fit=crop" alt="Voorbeeldafbeelding" style="width:100%; height:auto; display:block; opacity:.95;" />
+        </div>
+      </div>
+    </section>
+
+    <section id="prijzen" class="pricing container">
+      <h2 style="text-align:center; margin-bottom:1rem">Pakketten</h2>
+      <p style="text-align:center; color:var(--muted); margin-top:0">Kies het pakket dat bij je past.</p>
+      <div class="grid cols-3" style="margin-top:1.2rem">
+        <article class="card">
+          <h3>Start</h3>
+          <p class="kicker">Instap • 1x per week</p>
+          <p class="price">€49 <span style="font-size:.9rem; color:var(--muted)">/sessie</span></p>
+          <ul class="list">
+            <li><span class="bullet"></span> Intake + plan</li>
+            <li><span class="bullet"></span> Trainingsapp basis</li>
+            <li><span class="bullet"></span> Maandelijkse check-in</li>
+          </ul>
+          <a class="btn" href="#contact">Kies Start</a>
+        </article>
+        <article class="price-card">
+          <h3>Focus</h3>
+          <p class="kicker">Meest gekozen • 2x per week</p>
+          <p class="price">€79 <span style="font-size:.9rem; color:#cbd5e1">/sessie</span></p>
+          <ul class="list" style="text-align:left; max-width:420px; margin:0 auto 1rem">
+            <li><span class="bullet"></span> Persoonlijk schema + voeding</li>
+            <li><span class="bullet"></span> Wekelijkse progressiecall</li>
+            <li><span class="bullet"></span> App + video feedback</li>
+          </ul>
+          <a class="btn" href="#contact">Kies Focus</a>
+        </article>
+        <article class="card">
+          <h3>Pro</h3>
+          <p class="kicker">High-touch • 3x per week</p>
+          <p class="price">€99 <span style="font-size:.9rem; color:var(--muted)">/sessie</span></p>
+          <ul class="list">
+            <li><span class="bullet"></span> Alles uit Focus</li>
+            <li><span class="bullet"></span> Extra techniek-sessies</li>
+            <li><span class="bullet"></span> Rapportage voor doelen</li>
+          </ul>
+          <a class="btn" href="#contact">Kies Pro</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <div class="container two-col">
+        <div>
+          <h2>Contact</h2>
+          <p class="kicker">Reageer binnen 1 werkdag</p>
+          <form name="contact" method="post" action="#">
+            <input type="text" name="naam" placeholder="Je naam" required>
+            <input type="email" name="email" placeholder="Je e-mail" required>
+            <input type="tel" name="telefoon" placeholder="Je telefoon (optioneel)">
+            <textarea name="bericht" rows="5" placeholder="Waar kan ik mee helpen?" required></textarea>
+            <button class="btn" type="submit">Versturen</button>
+          </form>
+          <p style="color:var(--muted); font-size:.95rem">Door te versturen ga je akkoord met onze <a href="#">privacyverklaring</a>.</p>
+        </div>
+        <div class="card">
+          <h3>Zakelijke gegevens</h3>
+          <p class="kicker">Vervang onderstaande placeholders</p>
+          <ul class="list">
+            <li><span class="bullet"></span> Bedrijfsnaam: Jaouad PT</li>
+            <li><span class="bullet"></span> KvK: [nummer] • BTW: [nummer]</li>
+            <li><span class="bullet"></span> Locatie: [adres, stad]</li>
+            <li><span class="bullet"></span> E-mail: [info@jaouad-pt.nl]</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <footer>
-    <p>© <span id="year"></span> Jaouad PT</p>
+    <div class="container" style="display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap">
+      <div>© <span id="year"></span> Jaouad PT. Alle rechten voorbehouden.</div>
+      <div style="display:flex; gap:.9rem">
+        <a href="#">Privacy</a>
+        <a href="#">Algemene voorwaarden</a>
+        <a href="#">Cookie-instellingen</a>
+      </div>
+    </div>
   </footer>
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </body>
 </html>
+HTML
+
+git add index.html
+git commit -m "Publiceer nette onepager"
+git push
