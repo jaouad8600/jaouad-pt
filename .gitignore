@@ -1,5 +1,7 @@
+/vendor/
+storage/json/*.json
+storage/reports/*
+storage/outbox/*
+storage/users/*.bak
+!.gitkeep
 .DS_Store
-.vscode/
-.idea/
-node_modules/
-*.log

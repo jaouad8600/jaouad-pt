@@ -1,0 +1,16 @@
+[
+    {
+        "id": "a586dca8-f192-4ada-b4c6-1e3e3deecdf3",
+        "name": "Admin",
+        "email": "admin@example.org",
+        "role": "coordinator",
+        "pwd": "$2y$10$wFFbr87J3xC5ipaPiaVLZOrYVM0DHN9KZimV8B\/7qUJMEdxPlgb0e"
+    },
+    {
+        "id": "aeba777f-5ef6-47d9-aa26-82e09df47f93",
+        "name": "test",
+        "email": "aanuarr@gmail.com",
+        "role": "begeleider",
+        "pwd": "$2y$10$vl\/Iqo\/8ZcHsI7N36s147eA3j2gRX9VV8HL6Jz4Wg00S7Vnv3XZvG"
+    }
+]
