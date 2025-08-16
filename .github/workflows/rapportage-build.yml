@@ -15,7 +15,22 @@ jobs:
         with:
           node-version: '20'
 
-      # Titel automatisch zetten op basis van body-velden
+      - name: Ensure 'rapportage' label exists
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.rest.issues.getLabel({ owner: context.repo.owner, repo: context.repo.repo, name: "rapportage" });
+              core.info("Label 'rapportage' exists");
+            } catch (e) {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner, repo: context.repo.repo,
+                name: "rapportage", color: "FF7A00",
+                description: "Ingevulde sport-rapportage"
+              });
+              core.info("Label 'rapportage' created");
+            }
+
       - name: Retitle issue from form fields
         if: github.event_name == 'issues'
         uses: actions/github-script@v7

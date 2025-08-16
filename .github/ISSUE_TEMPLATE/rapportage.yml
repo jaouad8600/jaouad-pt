@@ -1,6 +1,6 @@
 name: "Rapportage sportmoment"
 description: "Vul dit formulier in na een sportmoment."
-title: "[Rapportage] {{ groep }} — {{ datum }} — {{ begeleider }}"
+title: "[Rapportage] Rapportage"
 labels: [rapportage]
 body:
   - type: input
@@ -21,7 +21,9 @@ body:
     validations: { required: true }
   - type: dropdown
     id: activiteit
-    attributes: { label: Activiteit, options: [Voetbal, Fitness, Basketbal, Boksen, Hardlopen, Anders] }
+    attributes:
+      label: Activiteit
+      options: [Voetbal, Fitness, Basketbal, Boksen, Hardlopen, Anders]
     validations: { required: true }
   - type: textarea
     id: opkomst
